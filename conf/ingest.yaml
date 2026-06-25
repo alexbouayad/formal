@@ -1,0 +1,13 @@
+defaults:
+  - base_ingest
+  - runtime: default
+  - wandb: default
+  - experiment/ingest: default
+  - _self_
+
+hydra:
+  job:
+    name: ingestion
+  sweeper:
+    params:
+      language: "${sweep_all_languages:}"

@@ -1,0 +1,1 @@
+run_name: "${hydra:job.name}-${output.artifact_name}-${output.config_name}"

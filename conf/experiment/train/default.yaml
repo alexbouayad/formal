@@ -1,0 +1,55 @@
+# @package _global_
+
+defaults:
+  - /formalization: default
+  - _self_
+
+wandb:
+  model_watch:
+    log: ALL
+    log_freq: 100
+    log_graph: true
+
+model:
+  id: "bigcode/starcoder2-3b"
+  dtype: BF16
+  device: "cuda"
+  attn_implementation: "sdpa"
+  gradient_checkpointing: true
+
+trainer:
+  rws:
+    num_particles: 8
+    particle_chunk_size: 8
+  max_grad_norm: 1.0
+  gradient_accumulation_steps: 10
+
+peft:
+  _target_: peft.LoraConfig
+  r: 32
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "c_fc"
+    - "c_proj"
+    - "embed_tokens"
+    - "lm_head"
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 3e-4
+  weight_decay: 0.01
+
+jaxtyping: false
+
+input:
+  artifact_name: "stack-v2-${get_name:${model.id}}"
+  config_name: "${get_language_id:${formalization.language}}"
+  revision: "main"
+
+output:
+  artifact_name: "${get_name:${model.id}}"
+  config_name: "${get_language_id:${formalization.language}}"
+  revision: "main"

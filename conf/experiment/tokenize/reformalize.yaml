@@ -1,0 +1,12 @@
+# @package _global_
+
+defaults:
+  - default
+  - _self_
+
+input:
+  artifact_name: "stack-v2-${get_name:${tokenizer_id}}"
+  config_name: "${get_language_id:${formalization.language}}"
+
+output:
+  config_name: "${get_language_id:${formalization.language}}-${hydra:runtime.choices.formalization}"

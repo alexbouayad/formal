@@ -1,0 +1,13 @@
+defaults:
+  - base_tokenize
+  - runtime: default
+  - wandb: default
+  - experiment/tokenize: default
+  - _self_
+
+hydra:
+  job:
+    name: tokenization
+  sweeper:
+    params:
+      formalization.language: ${sweep_all_languages:}

@@ -1,0 +1,10 @@
+# @package _global_
+
+num_samples: 15_000
+min_byte_size: 1
+max_byte_size: 100_000
+
+output:
+  artifact_name: "stack-v2"
+  config_name: "${get_language_id:${language}}"
+  revision: "main"

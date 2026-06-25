@@ -1,0 +1,10 @@
+defaults:
+  - base_train
+  - runtime: default
+  - wandb: default
+  - experiment/train: default
+  - _self_
+
+hydra:
+  job:
+    name: training

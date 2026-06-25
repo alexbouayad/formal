@@ -1,0 +1,15 @@
+# @package _global_
+
+defaults:
+  - default
+  - override /formalization: text_only
+  - _self_
+
+trainer:
+  rws: null
+
+input:
+  config_name: "${get_language_id:${formalization.language}}-text_only"
+
+output:
+  config_name: "${get_language_id:${formalization.language}}-sft_text"

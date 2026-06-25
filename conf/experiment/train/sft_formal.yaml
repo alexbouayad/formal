@@ -1,0 +1,14 @@
+# @package _global_
+
+defaults:
+  - default
+  - _self_
+
+trainer:
+  rws: null
+
+input:
+  config_name: "${get_language_id:${formalization.language}}"
+
+output:
+  config_name: "${get_language_id:${formalization.language}}-sft_formal"

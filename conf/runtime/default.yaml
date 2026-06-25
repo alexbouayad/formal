@@ -1,0 +1,4 @@
+num_proc: ${cpu_count:}
+max_threads: 32
+registry_root: "${default_registry_root:}"
+local_store_root: "${hydra_output_dir:}"
