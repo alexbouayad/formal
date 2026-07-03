@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from logging import DEBUG, getLogger
 from typing import Self
 
-from tree_sitter_generate import START_PARSE_STATE_ID
+from ts_generate import START_PARSE_STATE_ID
 
 from formal.engine.buffer import TextPosition
 from formal.engine.parser.stack import GSSNode

@@ -6,7 +6,7 @@ from typing import Final, override
 from greenlet import GreenletExit, greenlet
 
 from formal.engine.buffer import ReadOnlyBuffer, TextPosition
-from formal.grammar.types import Symbol
+from formal.grammar.types import ExternalState, Symbol
 from formal.language import LanguageInfo
 
 from ._ts_lexer import (
@@ -18,8 +18,8 @@ from ._ts_lexer import (
     TS_SERIALIZATION_BUFFER_SIZE,
     TSLexer,
 )
+from .interface import Scanner, ScanResult, ScanState
 from .scanlet import Scanlet
-from .scanner import ExternalState, Scanner, ScanResult, ScanState
 
 _mainlet: Final = greenlet.getcurrent()
 
@@ -67,11 +67,11 @@ class ExternalScanner(Scanner):
     def __init__(
         self,
         *,
+        buffer: ReadOnlyBuffer,
         language_info: LanguageInfo,
         external_symbols: Sequence[Symbol],
-        buffer: ReadOnlyBuffer,
     ) -> None:
-        cdll = CDLL(language_info.scanner_path)
+        cdll = CDLL(language_info.ts_scanner_path)
 
         ts_advance = ADVANCE_FUNC(self._ts_advance)
         ts_mark_end = MARK_END_FUNC(self._ts_mark_end)
@@ -128,7 +128,13 @@ class ExternalScanner(Scanner):
         self._end_position = ContextVar("end_position")
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: state={self.state}>"
+        if self.external_state is None:
+            symbols = ()
+
+        else:
+            symbols = tuple(symbol for symbol, is_valid in zip(self.external_symbols, self.external_state) if is_valid)
+
+        return f"<{self.__class__.__name__}: state={self.state}, symbols={symbols}>"
 
     @override
     def __bool__(self) -> bool:
@@ -141,12 +147,11 @@ class ExternalScanner(Scanner):
 
     @override
     def scan(self) -> ScanResult | None:
-        match self.state:
-            case Scanlet() as scanlet:
-                pass
+        if isinstance(self.state, Scanlet):
+            scanlet = self.state
 
-            case _:
-                scanlet = Scanlet(start_state=self.state, start_position=self._buffer.position, run=self._run)
+        else:
+            scanlet = Scanlet(start_state=self.state, start_position=self._buffer.position, run=self._run)
 
         return scanlet.switch()
 
@@ -154,31 +159,33 @@ class ExternalScanner(Scanner):
         self._scanner_deserialize(ts_scanner_ptr, scan_state, len(scan_state))
 
     def _run(self, start_state: ScanState | None) -> ScanResult | None:
+        self._update_ts_lookahead()
+
+        self.state = Scanlet.get_current()
+
+        if self.external_state is None:
+            self.external_state = (c_bool * len(self.external_symbols))()
+
         ts_scanner_ptr = self._scanner_create()
 
         try:
             if start_state is not None:
                 self._deserialize(ts_scanner_ptr, start_state)
 
-            self._update_ts_lookahead()
-
-            ext_state = self.external_state or (c_bool * len(self.external_symbols))()
-            found_symbol = self._scanner_scan(ts_scanner_ptr, byref(self._ts_lexer), ext_state)
-
+            match = self._scanner_scan(ts_scanner_ptr, byref(self._ts_lexer), self.external_state)
             end_state = self._serialize(ts_scanner_ptr)
 
         finally:
             self._scanner_destroy(ts_scanner_ptr)
 
-        if found_symbol:
-            symbol_id = self._ts_lexer.result_symbol
-            symbol = self.external_symbols[symbol_id]
+        self.state = end_state
+
+        if match:
+            symbol = self.external_symbols[self._ts_lexer.result_symbol]
             scan_result = ScanResult(symbol, self._end_position.get())
 
         else:
             scan_result = None
-
-        self.state = end_state
 
         return scan_result
 
@@ -186,7 +193,7 @@ class ExternalScanner(Scanner):
         num_bytes = self._scanner_serialize(ts_scanner_ptr, self._c_buffer)
         raw_bytes = self._c_buffer.raw[:num_bytes]
 
-        return ScanState(raw_bytes)
+        return raw_bytes
 
     def _update_ts_lookahead(self) -> None:
         if self._buffer.at_eof or self._exited.get():
@@ -203,9 +210,8 @@ class ExternalScanner(Scanner):
         buffer.read()
 
         while not buffer.lookahead and not buffer.at_eof:
-            result_symbol = self._ts_lexer.result_symbol
-
-            self.state = Scanlet.get_current()
+            external_state = self.external_state
+            ts_lexer_result_symbol = self._ts_lexer.result_symbol
 
             try:
                 _mainlet.switch()
@@ -214,8 +220,9 @@ class ExternalScanner(Scanner):
                 self._exited.set(True)
                 break
 
-            finally:
-                self._ts_lexer.result_symbol = result_symbol
+            self.state = Scanlet.get_current()
+            self.external_state = external_state
+            self._ts_lexer.result_symbol = ts_lexer_result_symbol
 
         self._update_ts_lookahead()
 

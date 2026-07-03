@@ -1,6 +1,8 @@
 from collections.abc import Generator, Iterable, Iterator
 from contextlib import contextmanager
 from copy import copy, replace
+from dataclasses import replace
+from enum import Enum
 from typing import Self
 
 from formal.engine.buffer import TextPosition
@@ -9,6 +11,13 @@ from formal.engine.scanner import Scanlet, ScanState
 from formal.grammar.types import LexState, ParseState
 
 from ._vertex import ParseSignature, ParseVertex
+
+
+class _Missing(Enum):
+    MISSING = 0
+
+
+_MISSING = _Missing.MISSING
 
 
 class ParseSurface(Iterable[ParseSignature]):
@@ -53,7 +62,7 @@ class ParseLattice:
     lex_state: LexState | None
     scan_state: Scanlet | ScanState | None
 
-    _head: ParseHead | None
+    _head: ParseHead
     _vertex: ParseVertex
 
     _index: dict[ParseHead, ParseVertex]
@@ -61,7 +70,7 @@ class ParseLattice:
     _roots: dict[ParseSignature, ParseVertex]
 
     @property
-    def head(self) -> ParseHead | None:
+    def head(self) -> ParseHead:
         return self._head
 
     @property
@@ -93,7 +102,7 @@ class ParseLattice:
         return iter(self._index)
 
     def __len__(self) -> int:
-        return len(self._inverse)
+        return len(self._index)
 
     def __repr__(self) -> str:
         return (
@@ -120,13 +129,16 @@ class ParseLattice:
 
         self._setup()
 
-    def focus(self, head: ParseHead) -> None:
+    def focus(self, head: ParseHead) -> bool:
         if self._head is head:
-            return
+            return True
 
         if vertex := self._index.get(head):
             self._head = head
             self._checkout(vertex)
+            return True
+
+        return False
 
     @contextmanager
     def peek(self, head: ParseHead) -> Generator[None]:
@@ -153,6 +165,16 @@ class ParseLattice:
             self.lex_state = stashed_lex_state
             self.scan_state = stashed_scan_state
 
+    def commit(self) -> None:
+        self._unlink(self._vertex)
+
+        self._vertex.stack = self.stack
+        self._vertex.position = self.position
+        self._vertex.lex_state = self.lex_state
+        self._vertex.scan_state = self.scan_state
+
+        self._link(self._vertex, parent=self._vertex.parent)
+
     def create(self) -> ParseHead:
         new_vertex = ParseVertex(
             stack=self.stack,
@@ -173,28 +195,29 @@ class ParseLattice:
             self._link(child, parent=self._vertex.parent)
 
         self._untrack(self._vertex)
-        self._head = None
 
     def superpose(
         self,
         *,
-        stack: GSSNode | None = None,
-        position: TextPosition | None = None,
-        lex_state: LexState | None = None,
-        scan_state: Scanlet | ScanState | None = None,
+        stack: GSSNode | _Missing = _MISSING,
+        position: TextPosition | _Missing = _MISSING,
+        lex_state: LexState | None | _Missing = _MISSING,
+        scan_state: Scanlet | ScanState | None | _Missing = _MISSING,
     ) -> ParseHead:
+        parent = self._vertex.parent
+
         new_vertex = ParseVertex(
-            stack=stack if stack is not None else self.stack,
-            position=position if position is not None else self.position,
-            lex_state=lex_state if lex_state is not None else self.lex_state,
-            scan_state=scan_state if scan_state is not None else self.scan_state,
+            stack=self._vertex.stack if stack is _MISSING else stack,
+            position=self._vertex.position if position is _MISSING else position,
+            lex_state=self._vertex.lex_state if lex_state is _MISSING else lex_state,
+            scan_state=self._vertex.scan_state if scan_state is _MISSING else scan_state,
         )
 
         new_head = self._track(new_vertex)
 
         self._unlink(self._vertex)
         self._link(self._vertex, parent=new_vertex)
-        self._link(new_vertex, parent=self._vertex.parent)
+        self._link(new_vertex, parent=parent)
 
         return new_head
 

@@ -1,12 +1,17 @@
-from typing import override
+from typing import TYPE_CHECKING, override
 
-from .scanner import ExternalState, Scanlet, Scanner, ScanState
+from formal.grammar.types import ExternalState
+
+from .interface import Scanner, ScanState
+
+if TYPE_CHECKING:
+    from .scanlet import Scanlet
 
 
 class EmptyScanner(Scanner):
     __slots__ = ("state", "external_state")
 
-    state: Scanlet | ScanState | None
+    state: "Scanlet | ScanState | None"
     external_state: ExternalState | None
 
     def __init__(self) -> None:

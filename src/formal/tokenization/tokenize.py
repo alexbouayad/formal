@@ -24,6 +24,7 @@ class _CharacterSet(set[str]):
         return (self.__class__, (tuple(self),))
 
 
+# TODO: remove
 def _contains_only_characters_from(source: str, character_set: Set[str]) -> bool:
     return set(source).issubset(character_set)
 
@@ -67,11 +68,13 @@ def tokenize(tokenization_config: TokenizationConfig) -> None:
     text_backend = AutoTokenizer.from_pretrained(tokenization_config.tokenizer_id)  # type: ignore
     text_backend = cast(TokenizersBackend, text_backend)
 
+    # TODO: remove
     character_set = _CharacterSet(
         text_backend.decode(token_id, clean_up_tokenization_spaces=False)  # type: ignore
         for token_id in range(text_backend.vocab_size)
     )
 
+    # TODO: remove
     dataset = dataset.filter(  # type: ignore
         function=_contains_only_characters_from,
         input_columns="source",
@@ -104,7 +107,7 @@ def tokenize(tokenization_config: TokenizationConfig) -> None:
         num_proc=tokenization_config.runtime.num_proc,
     )
 
-    # TODO
+    # TODO: remove
     # dataset = dataset.filter(  # type: ignore
     #     function=_is_valid_unicode,
     #     input_columns="decoded_tokens",

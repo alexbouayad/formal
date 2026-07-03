@@ -1,6 +1,5 @@
 /data/
 /multirun/
-/node_modules/
 /outputs/
 /wandb/
 /report/references
@@ -12,14 +11,16 @@
 __pycache__/
 bin/
 
-*.pyc
-*.log
-*.pkl
 *.aux
 *.bbl
 *.blg
-*.out
-*.synctex.gz
 *.fdb_latexmk
 *.fls
+*.log
+*.out
+*.pkl
+*.pyc
+*.so
+*.synctex.gz
+
 .DS_Store

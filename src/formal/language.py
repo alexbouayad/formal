@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
-from importlib import import_module
+from importlib import import_module, resources
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -35,62 +35,162 @@ class Language(StrEnum):
 class LanguageInfo:
     hf_name: str
     ts_name: str
+    ts_module_name: str
+    ts_grammar_dir: str
 
     @property
-    def ts_module_name(self) -> str:
-        return f"tree_sitter_{self.ts_name}"
+    def ts_grammar_path(self) -> str:
+        return f"{self.ts_grammar_dir}/grammar.json"
 
     @property
-    def grammar_path(self) -> str:
-        return f"./ts/{self.ts_name}/src/grammar.json"
-
-    @property
-    def scanner_path(self) -> str:
-        return f"./ts/{self.ts_name}/src/scanner.so"
+    def ts_scanner_path(self) -> str:
+        return f"{self.ts_grammar_dir}/scanner.so"
 
 
 def get_language_info(language: Language) -> LanguageInfo:
+    resource_root = resources.files("formal.grammar.tree_sitter")
+
     match language:
         case Language.BASH:
-            return LanguageInfo(hf_name="Shell", ts_name="bash")
+            return LanguageInfo(
+                hf_name="Shell",
+                ts_name="bash",
+                ts_module_name="tree_sitter_bash",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-bash/src",
+            )
         case Language.C:
-            return LanguageInfo(hf_name="C", ts_name="c")
+            return LanguageInfo(
+                hf_name="C",
+                ts_name="c",
+                ts_module_name="tree_sitter_c",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-c/src",
+            )
         case Language.CPP:
-            return LanguageInfo(hf_name="C++", ts_name="cpp")
+            return LanguageInfo(
+                hf_name="C++",
+                ts_name="cpp",
+                ts_module_name="tree_sitter_cpp",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-cpp/src",
+            )
         case Language.C_SHARP:
-            return LanguageInfo(hf_name="C-Sharp", ts_name="c_sharp")
+            return LanguageInfo(
+                hf_name="C-Sharp",
+                ts_name="c_sharp",
+                ts_module_name="tree_sitter_c_sharp",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-c-sharp/src",
+            )
         case Language.GO:
-            return LanguageInfo(hf_name="Go", ts_name="go")
+            return LanguageInfo(
+                hf_name="Go",
+                ts_name="go",
+                ts_module_name="tree_sitter_go",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-go/src",
+            )
         case Language.HASKELL:
-            return LanguageInfo(hf_name="Haskell", ts_name="haskell")
+            return LanguageInfo(
+                hf_name="Haskell",
+                ts_name="haskell",
+                ts_module_name="tree_sitter_haskell",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-haskell/src",
+            )
         case Language.HTML:
-            return LanguageInfo(hf_name="HTML", ts_name="html")
+            return LanguageInfo(
+                hf_name="HTML",
+                ts_name="html",
+                ts_module_name="tree_sitter_html",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-html/src",
+            )
         case Language.JAVA:
-            return LanguageInfo(hf_name="Java", ts_name="java")
+            return LanguageInfo(
+                hf_name="Java",
+                ts_name="java",
+                ts_module_name="tree_sitter_java",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-java/src",
+            )
         case Language.JAVASCRIPT:
-            return LanguageInfo(hf_name="JavaScript", ts_name="javascript")
+            return LanguageInfo(
+                hf_name="JavaScript",
+                ts_name="javascript",
+                ts_module_name="tree_sitter_javascript",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-javascript/src",
+            )
         case Language.JSON:
-            return LanguageInfo(hf_name="JSON", ts_name="json")
+            return LanguageInfo(
+                hf_name="JSON",
+                ts_name="json",
+                ts_module_name="tree_sitter_json",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-json/src",
+            )
         case Language.JULIA:
-            return LanguageInfo(hf_name="Julia", ts_name="julia")
+            return LanguageInfo(
+                hf_name="Julia",
+                ts_name="julia",
+                ts_module_name="tree_sitter_julia",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-julia/src",
+            )
         case Language.OCAML:
-            return LanguageInfo(hf_name="OCaml", ts_name="ocaml")
+            return LanguageInfo(
+                hf_name="OCaml",
+                ts_name="ocaml",
+                ts_module_name="tree_sitter_ocaml",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-ocaml/grammars/ocaml/src",
+            )
         case Language.PHP:
-            return LanguageInfo(hf_name="PHP", ts_name="php")
+            return LanguageInfo(
+                hf_name="PHP",
+                ts_name="php",
+                ts_module_name="tree_sitter_php",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-php/php/src",
+            )
         case Language.PYTHON:
-            return LanguageInfo(hf_name="Python", ts_name="python")
+            return LanguageInfo(
+                hf_name="Python",
+                ts_name="python",
+                ts_module_name="tree_sitter_python",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-python/src",
+            )
         case Language.REGEX:
-            return LanguageInfo(hf_name="Regular_Expression", ts_name="regex")
+            return LanguageInfo(
+                hf_name="Regular_Expression",
+                ts_name="regex",
+                ts_module_name="tree_sitter_regex",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-regex/src",
+            )
         case Language.RUBY:
-            return LanguageInfo(hf_name="Ruby", ts_name="ruby")
+            return LanguageInfo(
+                hf_name="Ruby",
+                ts_name="ruby",
+                ts_module_name="tree_sitter_ruby",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-ruby/src",
+            )
         case Language.RUST:
-            return LanguageInfo(hf_name="Rust", ts_name="rust")
+            return LanguageInfo(
+                hf_name="Rust",
+                ts_name="rust",
+                ts_module_name="tree_sitter_rust",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-rust/src",
+            )
         case Language.SCALA:
-            return LanguageInfo(hf_name="Scala", ts_name="scala")
+            return LanguageInfo(
+                hf_name="Scala",
+                ts_name="scala",
+                ts_module_name="tree_sitter_scala",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-scala/src",
+            )
         case Language.TYPESCRIPT:
-            return LanguageInfo(hf_name="TypeScript", ts_name="typescript")
+            return LanguageInfo(
+                hf_name="TypeScript",
+                ts_name="typescript",
+                ts_module_name="tree_sitter_typescript",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-typescript/typescript/src",
+            )
         case Language.VERILOG:
-            return LanguageInfo(hf_name="Verilog", ts_name="verilog")
+            return LanguageInfo(
+                hf_name="Verilog",
+                ts_name="verilog",
+                ts_module_name="tree_sitter_verilog",
+                ts_grammar_dir=f"{resource_root}/tree-sitter-verilog/src",
+            )
 
 
 @cache

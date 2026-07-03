@@ -9,7 +9,7 @@ from greenlet import greenlet
 
 from formal.engine.buffer import TextPosition
 
-from .scanner import ScanResult, ScanState
+from .interface import ScanResult, ScanState
 
 logger = getLogger(__name__)
 
@@ -28,10 +28,10 @@ class Scanlet:
     _glet: greenlet = field(default_factory=greenlet, init=False)
 
     def __post_init__(self) -> None:
-        def run(start_state: ScanState | None) -> ScanResult | None:
+        def run() -> ScanResult | None:
             _current_scanlet.set(self)
 
-            return self.run(start_state)
+            return self.run(self.start_state)
 
         self._glet.run = run
 
@@ -46,7 +46,7 @@ class Scanlet:
         return replace(self)
 
     def switch(self) -> ScanResult | None:
-        return self._glet.switch()
+        return self._glet.switch() or None
 
     def throw(self) -> None:
         # TODO: remove debug pool

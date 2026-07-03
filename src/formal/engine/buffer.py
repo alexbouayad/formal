@@ -130,11 +130,10 @@ class Buffer(ReadOnlyBuffer):
 
     def revert(self) -> None:
         string = self._string
-        checkpoint = self._checkpoint
 
-        string.truncate(checkpoint)
+        string.truncate(self._checkpoint)
 
-        if string.tell() >= checkpoint:
+        if string.tell() >= self._checkpoint:
             self._lookahead = ""
 
     def validate(self) -> None:
