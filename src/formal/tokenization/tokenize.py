@@ -1,6 +1,6 @@
 import logging
-from collections.abc import Iterable, Set, Sized
-from typing import Self, cast
+from collections.abc import Sized
+from typing import cast
 
 from transformers import AutoTokenizer, TokenizersBackend
 
@@ -13,23 +13,24 @@ from .config import TokenizationConfig
 logger = logging.getLogger(__name__)
 
 
-class _CharacterSet(set[str]):
-    def __init__(self, strings: Iterable[str], /) -> None:
-        super().__init__()
+# TODO: remove
+# class _CharacterSet(set[str]):
+#     def __init__(self, strings: Iterable[str], /) -> None:
+#         super().__init__()
 
-        for string in strings:
-            self.update(string)
+#         for string in strings:
+#             self.update(string)
 
-    def __reduce__(self) -> tuple[type[Self], tuple[tuple[str, ...]]]:
-        return (self.__class__, (tuple(self),))
+#     def __reduce__(self) -> tuple[type[Self], tuple[tuple[str, ...]]]:
+#         return (self.__class__, (tuple(self),))
 
 
 # TODO: remove
-def _contains_only_characters_from(source: str, character_set: Set[str]) -> bool:
-    return set(source).issubset(character_set)
+# def _contains_only_characters_from(source: str, character_set: Set[str]) -> bool:
+#     return set(source).issubset(character_set)
 
 
-# TODO
+# TODO: remove
 # def _is_valid_unicode(decoded_tokens: list[str]) -> bool:
 #     # Filter out samples that contain the Unicode replacement character (U+FFFD)
 #     return all(b"\xef\xbf\xbd" not in token.encode() for token in decoded_tokens)
@@ -69,18 +70,18 @@ def tokenize(tokenization_config: TokenizationConfig) -> None:
     text_backend = cast(TokenizersBackend, text_backend)
 
     # TODO: remove
-    character_set = _CharacterSet(
-        text_backend.decode(token_id, clean_up_tokenization_spaces=False)  # type: ignore
-        for token_id in range(text_backend.vocab_size)
-    )
+    # character_set = _CharacterSet(
+    #     text_backend.decode(token_id, clean_up_tokenization_spaces=False)  # type: ignore
+    #     for token_id in range(text_backend.vocab_size)
+    # )
 
     # TODO: remove
-    dataset = dataset.filter(  # type: ignore
-        function=_contains_only_characters_from,
-        input_columns="source",
-        fn_kwargs={"character_set": character_set},
-        num_proc=tokenization_config.runtime.num_proc,
-    )
+    # dataset = dataset.filter(  # type: ignore
+    #     function=_contains_only_characters_from,
+    #     input_columns="source",
+    #     fn_kwargs={"character_set": character_set},
+    #     num_proc=tokenization_config.runtime.num_proc,
+    # )
 
     dataset = dataset.map(  # type: ignore
         function=_remove_byte_order_mark,
