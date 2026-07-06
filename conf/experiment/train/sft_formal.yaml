@@ -7,8 +7,5 @@ defaults:
 trainer:
   rws: null
 
-input:
-  config: "${get_language_id:${formalization.language}}"
-
 output:
   config: "${get_language_id:${formalization.language}}-sft_formal"
