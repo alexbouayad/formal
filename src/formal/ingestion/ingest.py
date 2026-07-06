@@ -63,7 +63,6 @@ def ingest(ingestion_config: IngestionConfig) -> None:
         fn_kwargs={"max_workers": max_threads},
     )
 
-    dataset = dataset.rename_column("content", "source")
     dataset = dataset.filter(bool, input_columns="source")  # type: ignore
 
     artifacts.datasets.save(

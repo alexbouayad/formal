@@ -15,11 +15,11 @@ def _fetch(blob_id: str, src_encoding: str) -> str:
     try:
         with smart_open.open(s3_url, "rb", compression=".gz", transport_params={"client": _s3_client}) as f:  # type: ignore
             f = cast(IO[bytes], f)
-            content = f.read().decode(src_encoding)
+            source = f.read().decode(src_encoding, errors="replace")
 
-            return content
+            return source
 
-    except OSError:
+    except Exception:
         return ""
 
 
@@ -34,6 +34,7 @@ def fetch(batch: Mapping[str, list[Any]], max_workers: int | None) -> dict[str, 
         _s3_client = boto3.Session().client("s3", config=config)  # type: ignore
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        contents = [content for content in executor.map(_fetch, blob_ids, src_encodings)]
+        sources = executor.map(_fetch, blob_ids, src_encodings)
+        sources_list = list(sources)
 
-    return {"content": contents}
+    return {"source": sources_list}
