@@ -21,7 +21,7 @@ def load(
         case HFHubPath():
             dataset = datasets.load_dataset(  # type: ignore
                 path=f"hf://datasets/{registry_path.repo_id}",
-                name=reference.config_name,
+                name=reference.config,
                 revision=reference.revision,
                 num_proc=runtime_config.num_proc,
                 split=split,
@@ -44,7 +44,7 @@ def save(dataset: "Dataset", reference: DatasetReference, *, runtime_config: Run
         case HFHubPath():
             dataset.push_to_hub(
                 registry_path.repo_id,
-                config_name=reference.config_name,
+                config_name=reference.config,
                 revision=reference.revision,
                 num_proc=runtime_config.num_proc,
                 private=True,

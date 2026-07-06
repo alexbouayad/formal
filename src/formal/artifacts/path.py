@@ -36,20 +36,14 @@ class LocalPath(Path):
 
 
 def resolve_local_path(reference: ArtifactReference, root: str) -> LocalPath:
-    return (
-        LocalPath(root)
-        / f"{reference.artifact_type}s"
-        / reference.artifact_name
-        / reference.config_name
-        / reference.revision
-    )
+    return LocalPath(root) / f"{reference.type}s" / reference.name / reference.config / reference.revision
 
 
 def resolve_hf_hub_path(reference: ArtifactReference, root: str) -> HFHubPath:
     return HFHubPath(
         namespace=root,
-        repo_name=reference.artifact_name,
-        repo_type=reference.artifact_type,
+        repo_name=reference.name,
+        repo_type=reference.type,
     )
 
 

@@ -17,7 +17,7 @@ def log_input_on_wandb(reference: ArtifactReference, *, runtime_config: RuntimeC
     rev_prefix = "hf-rev" if runtime_config.registry_root.startswith("hf://") else "local-rev"
     name = f"{reference.identifier}:{rev_prefix}-{reference.revision}"
 
-    wandb_run.use_artifact(name, type=reference.artifact_type)
+    wandb_run.use_artifact(name, type=reference.type)
 
 
 def log_output_on_wandb(reference: ArtifactReference, *, runtime_config: RuntimeConfig) -> None:
@@ -29,7 +29,7 @@ def log_output_on_wandb(reference: ArtifactReference, *, runtime_config: Runtime
     else:
         local_store_path = resolve_local_path(reference, runtime_config.local_store_root)
 
-    artifact = wandb.Artifact(name=reference.identifier, type=reference.artifact_type)
+    artifact = wandb.Artifact(name=reference.identifier, type=reference.type)
     aliases: list[str] = []
 
     def add_local_reference(path: LocalPath):
@@ -49,7 +49,7 @@ def log_output_on_wandb(reference: ArtifactReference, *, runtime_config: Runtime
             )
 
             if repo_info.sha is not None:
-                hf_uri = f"{registry_path}/tree/{repo_info.sha}/{reference.config_name}"
+                hf_uri = f"{registry_path}/tree/{repo_info.sha}/{reference.config}"
                 artifact.add_reference(hf_uri, name="hf_hub", checksum=False)
 
                 aliases.append(f"hf-oid-{repo_info.sha}")

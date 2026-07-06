@@ -5,6 +5,6 @@ min_byte_size: 0
 max_byte_size: 500000
 
 output:
-  artifact_name: "stack-v2"
-  config_name: "${get_language_id:${language}}"
+  name: "stack-v2"
+  config: "${get_language_id:${language}}"
   revision: "main"

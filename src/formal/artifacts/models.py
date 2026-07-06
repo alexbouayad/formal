@@ -16,12 +16,12 @@ def load(reference: ModelReference, *, runtime_config: RuntimeConfig) -> "Formal
         case HFHubPath():
             model = FormalModel.from_pretrained(
                 path=registry_path.repo_id,
-                config_name=reference.config_name,
+                config_name=reference.config,
                 revision=reference.revision,
             )
 
         case LocalPath():
-            model = FormalModel.from_pretrained(str(registry_path), config_name=reference.config_name)
+            model = FormalModel.from_pretrained(str(registry_path), config_name=reference.config)
 
     return model
 
@@ -36,7 +36,7 @@ def save(model: "FormalModel", reference: ModelReference, *, runtime_config: Run
         case HFHubPath():
             model.push_to_hub(
                 repo_id=registry_path.repo_id,
-                config_name=reference.config_name,
+                config_name=reference.config,
                 revision=reference.revision,
                 private=True,
             )
@@ -46,7 +46,7 @@ def save(model: "FormalModel", reference: ModelReference, *, runtime_config: Run
                 registry_path.alias(local_store_path)
 
             else:
-                model.save_pretrained(str(registry_path), config_name=reference.config_name)
+                model.save_pretrained(str(registry_path), config_name=reference.config)
 
     if local_store_path:
-        model.save_pretrained(str(local_store_path), config_name=reference.config_name)
+        model.save_pretrained(str(local_store_path), config_name=reference.config)

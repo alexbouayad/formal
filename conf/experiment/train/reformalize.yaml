@@ -5,7 +5,7 @@ defaults:
   - _self_
 
 input:
-  config_name: "${get_language_id:${formalization.language}}-${hydra:runtime.choices.formalization}"
+  config: "${get_language_id:${formalization.language}}-${hydra:runtime.choices.formalization}"
 
 output:
-  config_name: "${get_language_id:${formalization.language}}-${hydra:runtime.choices.formalization}"
+  config: "${get_language_id:${formalization.language}}-${hydra:runtime.choices.formalization}"

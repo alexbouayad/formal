@@ -10,11 +10,11 @@ min_seq_length: 0
 max_seq_length: 16000
 
 input:
-  artifact_name: "stack-v2"
-  config_name: "${get_language_id:${formalization.language}}"
+  name: "stack-v2"
+  config: "${get_language_id:${formalization.language}}"
   revision: "main"
 
 output:
-  artifact_name: "stack-v2-${get_name:${tokenizer_id}}"
-  config_name: "${get_language_id:${formalization.language}}"
+  name: "stack-v2-${get_name:${tokenizer_id}}"
+  config: "${get_language_id:${formalization.language}}"
   revision: "main"
