@@ -16,9 +16,9 @@ class ArtifactReference:
 
 
 class DatasetReference(ArtifactReference):
-    artifact_type = "dataset"
+    type = "dataset"
 
 
 @dataclass(kw_only=True, slots=True)
 class ModelReference(ArtifactReference):
-    artifact_type = "model"
+    type = "model"
