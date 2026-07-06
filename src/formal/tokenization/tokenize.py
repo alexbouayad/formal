@@ -36,19 +36,8 @@ logger = logging.getLogger(__name__)
 #     return all(b"\xef\xbf\xbd" not in token.encode() for token in decoded_tokens)
 
 
-def _is_within_bounds(sequence: Sized, *, min_length: int | None, max_length: int | None) -> bool:
-    match min_length, max_length:
-        case None, None:
-            return True
-
-        case None, _:
-            return len(sequence) <= max_length
-
-        case _, None:
-            return min_length <= len(sequence)
-
-        case _, _:
-            return min_length <= len(sequence) <= max_length
+def _is_within_bounds(sequence: Sized, *, min_length: int, max_length: int) -> bool:
+    return min_length <= len(sequence) <= max_length
 
 
 def _remove_byte_order_mark(source: str) -> dict[str, str]:
@@ -107,6 +96,8 @@ def tokenize(tokenization_config: TokenizationConfig) -> None:
         },
         num_proc=tokenization_config.runtime.num_proc,
     )
+
+    dataset = dataset.filter(bool, input_columns="token_ids")  # type: ignore
 
     # TODO: remove
     # dataset = dataset.filter(  # type: ignore

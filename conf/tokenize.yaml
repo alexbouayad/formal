@@ -1,7 +1,7 @@
 defaults:
   - base_tokenize
-  - runtime: default
   - wandb: default
+  - runtime: default
   - experiment/tokenize: default
   - _self_
 

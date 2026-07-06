@@ -6,7 +6,7 @@ defaults:
 
 tokenizer_id: "bigcode/starcoder2-3b"
 
-min_seq_length: 1
+min_seq_length: 0
 max_seq_length: 16000
 
 input:

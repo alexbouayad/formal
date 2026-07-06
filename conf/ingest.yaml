@@ -1,7 +1,7 @@
 defaults:
   - base_ingest
-  - runtime: default
   - wandb: default
+  - runtime: default
   - experiment/ingest: default
   - _self_
 

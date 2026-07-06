@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
 from formal.artifacts.references import DatasetReference
-from formal.config import FormalizationConfig, StageConfig
+from formal.config import FormalizationConfig, RunConfig
 
 
 @dataclass(kw_only=True)
-class TokenizationConfig(StageConfig):
+class TokenizationConfig(RunConfig):
     tokenizer_id: str
     formalization: FormalizationConfig
 

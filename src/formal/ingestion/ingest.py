@@ -14,19 +14,8 @@ from .config import IngestionConfig
 logger = logging.getLogger(__name__)
 
 
-def _is_within_bounds(size: int, *, min_size: int | None, max_size: int | None) -> bool:
-    match min_size, max_size:
-        case None, None:
-            return True
-
-        case None, _:
-            return size <= max_size
-
-        case _, None:
-            return min_size <= size
-
-        case _, _:
-            return min_size <= size <= max_size
+def _is_within_bounds(size: int, *, min_size: int, max_size: int) -> bool:
+    return min_size <= size <= max_size
 
 
 @with_wandb
@@ -63,15 +52,19 @@ def ingest(ingestion_config: IngestionConfig) -> None:
 
     logger.info("Loading content data...")
 
+    max_threads = ingestion_config.runtime.max_threads or 4
+
+    # TODO: try enabling multiprocessing here
     dataset = dataset.map(  # type: ignore
         fetch,
         batched=True,
-        batch_size=8 * (ingestion_config.runtime.max_threads or 1),
+        batch_size=16 * max_threads,
         remove_columns="src_encoding",
-        fn_kwargs={"max_workers": ingestion_config.runtime.max_threads},
+        fn_kwargs={"max_workers": max_threads},
     )
 
     dataset = dataset.rename_column("content", "source")
+    dataset = dataset.filter(bool, input_columns="source")  # type: ignore
 
     artifacts.datasets.save(
         dataset=dataset,

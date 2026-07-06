@@ -7,7 +7,7 @@ from typing import Callable
 import wandb
 
 from formal.artifacts import ArtifactReference, HFHubPath, LocalPath, resolve_local_path, resolve_path
-from formal.config import RuntimeConfig, StageConfig
+from formal.config import RunConfig, RuntimeConfig
 
 
 def log_input_on_wandb(reference: ArtifactReference, *, runtime_config: RuntimeConfig) -> None:
@@ -67,7 +67,7 @@ def log_output_on_wandb(reference: ArtifactReference, *, runtime_config: Runtime
     wandb_run.log_artifact(artifact, aliases=aliases)
 
 
-def with_wandb[ConfigT: StageConfig](func: Callable[[ConfigT], None]) -> Callable[[ConfigT], None]:
+def with_wandb[ConfigT: RunConfig](func: Callable[[ConfigT], None]) -> Callable[[ConfigT], None]:
     @wraps(func)
     def wrapper(config: ConfigT) -> None:
         if config.wandb is None:

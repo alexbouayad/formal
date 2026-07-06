@@ -19,7 +19,7 @@ def _fetch(blob_id: str, src_encoding: str) -> str:
 
             return content
 
-    except Exception:
+    except OSError:
         return ""
 
 

@@ -13,13 +13,13 @@ from hydra.core.config_store import ConfigStore
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 
-from formal.config import StageConfig
+from formal.config import RunConfig
 from formal.language import Language
 from formal.utils.hf_hub import get_hf_namespace
 
 
 class HydraDecorator(Protocol):
-    def __call__[ConfigT: StageConfig](self, func: Callable[[ConfigT], None]) -> Callable[[], None]: ...
+    def __call__[ConfigT: RunConfig](self, func: Callable[[ConfigT], None]) -> Callable[[], None]: ...
 
 
 def instantiable_field(target: str) -> dict[str, Any]:
@@ -27,7 +27,7 @@ def instantiable_field(target: str) -> dict[str, Any]:
 
 
 def main(stage_name: str) -> HydraDecorator:
-    def decorator[ConfigT: StageConfig](func: Callable[[ConfigT], None]) -> Callable[[], None]:
+    def decorator[ConfigT: RunConfig](func: Callable[[ConfigT], None]) -> Callable[[], None]:
         @wraps(func)
         def wrapper(dict_config: DictConfig) -> None:
             # TODO
@@ -53,7 +53,7 @@ def main(stage_name: str) -> HydraDecorator:
     return decorator
 
 
-def setup(stage_name: str, config_cls: type[StageConfig]) -> ConfigStore:
+def setup(stage_name: str, config_cls: type[RunConfig]) -> ConfigStore:
     def get_hydra_output_dir() -> str | None:
         runtime_config = HydraConfig.get().runtime
         runtime_config = cast(DictConfig, runtime_config)

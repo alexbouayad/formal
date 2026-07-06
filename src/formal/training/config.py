@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Any
 
 from formal.artifacts import DatasetReference, ModelReference
-from formal.config import FormalizationConfig, StageConfig
+from formal.config import FormalizationConfig, RunConfig
 from formal.utils import hydra
 
 
@@ -36,7 +36,7 @@ class TrainerArguments:
 
 
 @dataclass(kw_only=True)
-class TrainingConfig(StageConfig):
+class TrainingConfig(RunConfig):
     model: ModelArguments
     trainer: TrainerArguments
     formalization: FormalizationConfig

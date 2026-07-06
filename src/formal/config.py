@@ -11,25 +11,17 @@ class FormalTokenPlacement(StrEnum):
     OMIT = "omit"
 
 
-class WandBWatchTarget(StrEnum):
-    ALL = "all"
-    GRADIENTS = "gradients"
-    PARAMETERS = "parameters"
-
-
 @dataclass(kw_only=True)
 class FormalizationConfig:
-    language: Language
+    language: Language = field(kw_only=False)
     include_fields: bool = False
     token_placement: FormalTokenPlacement = FormalTokenPlacement.PREFIX
 
 
-@dataclass(kw_only=True)
-class RuntimeConfig:
-    num_proc: int | None = None
-    max_threads: int | None = None
-    registry_root: str = "./data"
-    local_store_root: str | None = None
+class WandBWatchTarget(StrEnum):
+    ALL = "all"
+    GRADIENTS = "gradients"
+    PARAMETERS = "parameters"
 
 
 @dataclass(kw_only=True)
@@ -41,12 +33,20 @@ class WandBWatchConfig:
 
 @dataclass(kw_only=True)
 class WandBConfig:
-    project: str = "formal"
+    project: str | None = None
     run_name: str | None = None
     model_watch: WandBWatchConfig | None = None
 
 
 @dataclass(kw_only=True)
-class StageConfig:
-    runtime: RuntimeConfig = field(default_factory=RuntimeConfig)
+class RuntimeConfig:
+    num_proc: int | None = None
+    max_threads: int | None = None
+    registry_root: str = "./data"
+    local_store_root: str | None = None
+
+
+@dataclass(kw_only=True)
+class RunConfig:
     wandb: WandBConfig | None = None
+    runtime: RuntimeConfig = field(default_factory=RuntimeConfig)

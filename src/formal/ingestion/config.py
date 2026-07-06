@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 
 from formal.artifacts.references import DatasetReference
-from formal.config import StageConfig
+from formal.config import RunConfig
 from formal.language import Language
 
 
 @dataclass(kw_only=True)
-class IngestionConfig(StageConfig):
+class IngestionConfig(RunConfig):
     language: Language
 
     num_samples: int | None = None

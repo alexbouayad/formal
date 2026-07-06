@@ -1,7 +1,7 @@
 defaults:
   - base_train
-  - runtime: default
   - wandb: default
+  - runtime: default
   - experiment/train: default
   - _self_
 
