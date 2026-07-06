@@ -9,7 +9,7 @@ trainer:
   rws: null
 
 input:
-  config: "${get_language_id:${formalization.language}}-text_only"
+  config: "${get_language_id:${formalization.language}}-textual"
 
 output:
   config: "${get_language_id:${formalization.language}}-sft_text"
