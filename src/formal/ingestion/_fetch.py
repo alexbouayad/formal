@@ -8,19 +8,25 @@ import smart_open
 
 _s3_client: Any | None = None
 
+#  TODO: move max_retries to hydra config
+_MAX_RETRIES = 5
+
 
 def _fetch(blob_id: str, src_encoding: str) -> str:
     s3_url = f"s3://softwareheritage/content/{blob_id}"
 
-    try:
-        with smart_open.open(s3_url, "rb", compression=".gz", transport_params={"client": _s3_client}) as f:  # type: ignore
-            f = cast(IO[bytes], f)
-            source = f.read().decode(src_encoding)
+    for _ in range(_MAX_RETRIES + 1):
+        try:
+            with smart_open.open(s3_url, "rb", compression=".gz", transport_params={"client": _s3_client}) as f:  # type: ignore
+                f = cast(IO[bytes], f)
+                source = f.read().decode(src_encoding)
 
-            return source
+                return source
 
-    except Exception:
-        return ""
+        except Exception:
+            pass
+
+    return ""
 
 
 def fetch(batch: Mapping[str, list[Any]], max_workers: int | None) -> dict[str, list[str]]:
