@@ -15,7 +15,7 @@ def _fetch(blob_id: str, src_encoding: str) -> str:
     try:
         with smart_open.open(s3_url, "rb", compression=".gz", transport_params={"client": _s3_client}) as f:  # type: ignore
             f = cast(IO[bytes], f)
-            source = f.read().decode(src_encoding, errors="replace")
+            source = f.read().decode(src_encoding)
 
             return source
 

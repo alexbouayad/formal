@@ -2,7 +2,7 @@ import logging
 from collections.abc import Generator
 from typing import Any
 
-from datasets import Dataset, load_dataset  # type: ignore
+from datasets import Dataset, disable_caching, load_dataset  # type: ignore
 
 from formal import artifacts
 from formal.language import get_language_info
@@ -20,6 +20,8 @@ def _is_within_bounds(size: int, *, min_size: int, max_size: int) -> bool:
 
 @with_wandb
 def ingest(ingestion_config: IngestionConfig) -> None:
+    disable_caching()
+
     language_info = get_language_info(ingestion_config.language)
 
     iterable_dataset = load_dataset(
