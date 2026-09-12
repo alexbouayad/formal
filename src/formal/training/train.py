@@ -91,7 +91,7 @@ def train(training_config: TrainingConfig) -> None:
     if training_config.model.gradient_checkpointing:
         base_model.gradient_checkpointing_enable()  # type: ignore
 
-    peft_config = instantiate(training_config.peft)
+    peft_config = instantiate(training_config.peft, _convert_="all")
     peft_config = cast(PeftConfig, peft_config)
 
     peft_model = get_peft_model(base_model, peft_config=peft_config)
