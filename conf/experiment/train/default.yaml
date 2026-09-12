@@ -19,8 +19,8 @@ model:
 
 trainer:
   rws:
-    num_particles: 8
-    particle_chunk_size: 8
+    num_particles: 4
+    particle_chunk_size: 4
   max_grad_norm: 1.0
   gradient_accumulation_steps: 10
 
