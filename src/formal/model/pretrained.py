@@ -66,9 +66,10 @@ class PreTrainedFormalModel(nn.Module):
 
         return commit_info
 
-    def save_pretrained(self, save_directory: str, *, config_name: str = "default") -> None:
-        formalization_config_path = Path(save_directory) / config_name / "formalization_config.json"
-        formal_safetensors_path = Path(save_directory) / config_name / "formal_embeddings.safetensors"
+    def save_pretrained(self, save_directory: str, *, config_name: str) -> None:
+        adapter_directory = Path(save_directory) / config_name
+        formalization_config_path = adapter_directory / "formalization_config.json"
+        formal_safetensors_path = adapter_directory / "formal_embeddings.safetensors"
 
         formalization_config_json = json.dumps(asdict(self.formalization_config), indent=2)
 
@@ -78,7 +79,7 @@ class PreTrainedFormalModel(nn.Module):
             "formal_output_embedding.weight": self.formal_output_embedding.weight.detach().contiguous(),
         }
 
-        self.text_model.save_pretrained(save_directory, adapter_name=config_name)
+        self.text_model.save_pretrained(str(adapter_directory))
         formalization_config_path.write_text(formalization_config_json)
         safetensors.torch.save_file(formal_embeddings_state_dict, formal_safetensors_path)  # type: ignore
 
@@ -86,7 +87,7 @@ class PreTrainedFormalModel(nn.Module):
     def from_pretrained(cls, path: str, *, config_name: str = "default", revision: str = "main") -> Self:
         text_model = AutoPeftModelForCausalLM.from_pretrained(  # type: ignore
             pretrained_model_name_or_path=path,
-            adapter_name=config_name,
+            subfolder=config_name,
             revision=revision,
         )
 
